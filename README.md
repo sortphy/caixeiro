@@ -51,4 +51,5 @@
     - Evaporação: Taxa de evaporação dos feromônios.
     - Feromônio: Quantidade de feromônios depositados por cada formiga.
     - Reforço da Melhor Rota: Faz com que a formiga com a melhor rota deposite mais feromônios.
+    - Velocidade máxima: Remove animações e otimiza o algorítimo e o navegador para executar na velocidade mais alta possível.
 

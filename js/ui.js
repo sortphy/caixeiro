@@ -22,14 +22,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const edge = event.currentTarget;
     const line = edge.querySelector('.road');
     
-    // Highlight current road
-    line.classList.add('highlighted');
-    line.classList.add('road-hovered');
+    // Store original styles if not already stored
+    if (!line.dataset.originalStyles) {
+      const styles = getComputedStyle(line);
+      line.dataset.originalStyles = JSON.stringify({
+        stroke: line.style.stroke || styles.stroke,
+        strokeWidth: line.style.strokeWidth || styles.strokeWidth
+      });
+    }
     
-    // Dim all other roads
+    // Increase stroke width directly - preserving existing color
+    const currentWidth = parseFloat(getComputedStyle(line).strokeWidth);
+    line.style.strokeWidth = `${Math.max(currentWidth, 4)}px`;
+    
+    // Remove any classes that might interfere with colors
+    line.classList.remove('highlighted', 'road-hovered');
+    
+    // Dim all other roads by directly setting opacity and stroke-width
     document.querySelectorAll('.road').forEach(road => {
       if (road !== line) {
-        road.classList.add('road-dimmed');
+        // Store original styles for other roads if not already stored
+        if (!road.dataset.originalStyles) {
+          const styles = getComputedStyle(road);
+          road.dataset.originalStyles = JSON.stringify({
+            opacity: road.style.opacity || styles.opacity || "1",
+            strokeWidth: road.style.strokeWidth || styles.strokeWidth
+          });
+        }
+        
+        // Apply dimming directly with inline styles
+        road.style.opacity = "0.3";
+        road.style.strokeWidth = "1px";
+        
+        // Remove any classes that might interfere
+        road.classList.remove('road-dimmed');
       }
     });
     
@@ -45,13 +71,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const edge = event.currentTarget;
     const line = edge.querySelector('.road');
     
-    // Remove highlighting from current road
-    line.classList.remove('highlighted');
-    line.classList.remove('road-hovered');
+    // Restore original styles from stored data
+    if (line.dataset.originalStyles) {
+      const originalStyles = JSON.parse(line.dataset.originalStyles);
+      if (originalStyles.stroke) line.style.stroke = originalStyles.stroke;
+      if (originalStyles.strokeWidth) line.style.strokeWidth = originalStyles.strokeWidth;
+      
+      // Clear stored data
+      delete line.dataset.originalStyles;
+    }
     
     // Restore all other roads
     document.querySelectorAll('.road').forEach(road => {
-      road.classList.remove('road-dimmed');
+      if (road !== line && road.dataset.originalStyles) {
+        const originalStyles = JSON.parse(road.dataset.originalStyles);
+        if (originalStyles.opacity) road.style.opacity = originalStyles.opacity;
+        if (originalStyles.strokeWidth) road.style.strokeWidth = originalStyles.strokeWidth;
+        
+        // Clear stored data
+        delete road.dataset.originalStyles;
+      }
     });
     
     // Clear distance info

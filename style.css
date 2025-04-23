@@ -501,14 +501,14 @@ svg {
 /* Road hover effects */
 .road.road-hovered {
   stroke-width: 4px !important;
-  stroke: #333 !important;
+  filter: brightness(0.8) !important;
   z-index: 10;
   position: relative;
   transition: all 0.2s ease;
 }
 
 .road.road-dimmed {
+  opacity: 0.3 !important;
   stroke-width: 1px !important;
-  opacity: 0.3;
   transition: all 0.2s ease;
 } 

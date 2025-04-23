@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const betaValue = document.getElementById('beta-value');
     const delayValue = document.getElementById('delay-value');
     const resetBtn = document.getElementById('resetBtn');
+    const statusContainer = document.getElementById('status-container');
     
     // City generator UI elements
     const cityCountInput = document.getElementById('city-count');
@@ -108,6 +109,9 @@ document.addEventListener('DOMContentLoaded', function() {
       currentBestRoute = bestRoute;
       
       if (currentBestRoute) {
+        // Store references to all best path edges for highlighting
+        window.bestPathEdges = [];
+        
         for (let i = 0; i < currentBestRoute.length - 1; i++) {
           const cityA = currentBestRoute[i];
           const cityB = currentBestRoute[i + 1];
@@ -116,10 +120,53 @@ document.addEventListener('DOMContentLoaded', function() {
           if (edge) {
             const roadElement = edge.querySelector('.road');
             roadElement.classList.add('best-path');
+            window.bestPathEdges.push(roadElement);
           }
         }
       }
     }
+  
+    // Best path highlight effect
+    function setupBestPathHighlight() {
+      if (statusContainer) {
+        statusContainer.addEventListener('mouseenter', function() {
+          // Check if we have the best path edges stored
+          if (window.bestPathEdges && window.bestPathEdges.length > 0) {
+            // Highlight best path edges directly from our stored array
+            window.bestPathEdges.forEach(path => {
+              path.classList.add('highlight-best-path');
+            });
+            
+            // Dim other paths
+            document.querySelectorAll('.road').forEach(path => {
+              if (!window.bestPathEdges.includes(path)) {
+                path.classList.add('dim-other-paths');
+              }
+            });
+          } else {
+            // Fallback to the old method if for some reason we don't have stored edges
+            document.querySelectorAll('.road.best-path').forEach(path => {
+              path.classList.add('highlight-best-path');
+            });
+            
+            document.querySelectorAll('.road:not(.best-path)').forEach(path => {
+              path.classList.add('dim-other-paths');
+            });
+          }
+        });
+        
+        statusContainer.addEventListener('mouseleave', function() {
+          // Remove highlighting from all roads
+          document.querySelectorAll('.road').forEach(path => {
+            path.classList.remove('highlight-best-path');
+            path.classList.remove('dim-other-paths');
+          });
+        });
+      }
+    }
+
+    // Set up the highlight effect
+    setupBestPathHighlight();
   
     // Handle iteration complete
     function handleIterationComplete(iteration, bestRoute, bestDistance) {
@@ -140,6 +187,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update best path visual
         updateBestPathDisplay(bestRoute);
+        
+        // Refresh the highlight effect setup
+        setupBestPathHighlight();
       }
     }
   
@@ -342,4 +392,4 @@ document.addEventListener('DOMContentLoaded', function() {
       htmlElement.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
     });
-  });
+});

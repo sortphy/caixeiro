@@ -10,11 +10,12 @@ class ACO {
       // Parameters
       this.alpha = options.alpha || 1; // Pheromone importance
       this.beta = options.beta || 2;   // Distance importance
-      this.rho = options.rho || 0.1;   // Evaporation rate
+      this.rho = options.rho || 0.5;   // Evaporation rate
       this.Q = options.Q || 100;       // Pheromone deposit factor
-      this.numAnts = options.numAnts || this.numCities;
+      this.numAnts = options.numAnts || Math.floor(this.numCities / 2);
       this.maxIterations = options.maxIterations || 10;
       this.iterationDelay = options.iterationDelay || 500; // Delay between iterations in ms
+      this.bestPathReinforcement = options.bestPathReinforcement || false; // Enable best path reinforcement
       
       // Initialize pheromones
       this.pheromones = {};
@@ -171,6 +172,17 @@ class ACO {
         this.pheromones[edge] *= (1 - this.rho);
       }
       
+      // Find best ant in current iteration
+      let bestAnt = null;
+      let bestAntDistance = Infinity;
+      
+      for (const ant of this.ants) {
+        if (ant.totalDistance < bestAntDistance) {
+          bestAntDistance = ant.totalDistance;
+          bestAnt = ant;
+        }
+      }
+      
       // Deposit
       for (const ant of this.ants) {
         const contribution = this.Q / ant.totalDistance;
@@ -181,6 +193,27 @@ class ACO {
           const edge = this.getEdgeKey(cityA, cityB);
           
           this.pheromones[edge] += contribution;
+          
+          // Best path reinforcement - extra pheromone for the best ant if enabled
+          if (this.bestPathReinforcement && ant === bestAnt) {
+            this.pheromones[edge] += contribution * 2; // Double pheromone for best ant
+          }
+          
+          // Notify about pheromone update for visualization
+          await this.onPheromoneUpdate(edge, this.pheromones[edge]);
+        }
+      }
+      
+      // Global best path reinforcement (always apply to the all-time best path)
+      if (this.bestPathReinforcement && this.bestRoute) {
+        const bestPathContribution = this.Q / this.bestDistance * 1.5; // 50% more than normal
+        
+        for (let i = 0; i < this.bestRoute.length - 1; i++) {
+          const cityA = this.bestRoute[i];
+          const cityB = this.bestRoute[i + 1];
+          const edge = this.getEdgeKey(cityA, cityB);
+          
+          this.pheromones[edge] += bestPathContribution;
           
           // Notify about pheromone update for visualization
           await this.onPheromoneUpdate(edge, this.pheromones[edge]);
@@ -198,5 +231,25 @@ class ACO {
     
     setIterationDelay(delay) {
       this.iterationDelay = delay;
+    }
+    
+    setMaxIterations(maxIterations) {
+      this.maxIterations = maxIterations;
+    }
+    
+    setNumAnts(numAnts) {
+      this.numAnts = numAnts;
+    }
+    
+    setEvaporationRate(rate) {
+      this.rho = rate;
+    }
+    
+    setPheromoneConstant(constant) {
+      this.Q = constant;
+    }
+    
+    setBestPathReinforcement(enabled) {
+      this.bestPathReinforcement = enabled;
     }
   }

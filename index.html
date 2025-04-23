@@ -79,6 +79,13 @@
   <div class="controls">
     <div class="control-item">
       <div class="slider-container">
+        <label for="delay-slider">Velocidade:</label>
+        <input type="range" id="delay-slider" min="1" max="1000" step="10" value="300">
+        <span id="delay-value" class="slider-value">300ms</span>
+      </div>
+    </div>
+    <div class="control-item">
+      <div class="slider-container">
         <label for="alpha-slider">Alfa:</label>
         <input type="range" id="alpha-slider" min="0.1" max="5" step="0.1" value="1">
         <span id="alpha-value" class="slider-value">1</span>
@@ -93,10 +100,38 @@
     </div>
     <div class="control-item">
       <div class="slider-container">
-        <label for="delay-slider">Velocidade:</label>
-        <input type="range" id="delay-slider" min="10" max="1000" step="10" value="300">
-        <span id="delay-value" class="slider-value">300ms</span>
+        <label for="iterations-slider">Iterações:</label>
+        <input type="range" id="iterations-slider" min="1" max="1000" step="1" value="10">
+        <span id="iterations-value" class="slider-value">10</span>
       </div>
+    </div>
+    <div class="control-item">
+      <div class="slider-container">
+        <label for="ants-slider">Formigas:</label>
+        <input type="range" id="ants-slider" min="1" max="100" step="1" value="2">
+        <span id="ants-value" class="slider-value">2</span>
+      </div>
+    </div>
+    <div class="control-item">
+      <div class="slider-container">
+        <label for="evaporation-slider">Evaporação:</label>
+        <input type="range" id="evaporation-slider" min="0.1" max="1" step="0.05" value="0.5">
+        <span id="evaporation-value" class="slider-value">0.5</span>
+      </div>
+    </div>
+    <div class="control-item">
+      <div class="slider-container">
+        <label for="pheromone-slider">Feromônio:</label>
+        <input type="range" id="pheromone-slider" min="10" max="500" step="10" value="100">
+        <span id="pheromone-value" class="slider-value">100</span>
+      </div>
+    </div>
+    <div class="control-item toggle-container">
+      <label for="best-path-toggle">Reforço da Melhor Rota:</label>
+      <label class="switch">
+        <input type="checkbox" id="best-path-toggle">
+        <span class="slider round"></span>
+      </label>
     </div>
     <div class="button-container">
       <button id="simulateBtn">Simular</button>
@@ -132,6 +167,11 @@
       <p><strong>Alfa</strong> controla a influência dos feromônios. Valores mais altos fazem com que as formigas sigam caminhos existentes com maior probabilidade.</p>
       <p><strong>Beta</strong> controla a influência das distâncias. Valores mais altos fazem com que as formigas escolham caminhos mais curtos com maior probabilidade.</p>
       <p><strong>Velocidade</strong> controla a velocidade de animação das formigas e da simulação.</p>
+      <p><strong>Iterações</strong> define quantas vezes o algoritmo será executado. Mais iterações geralmente levam a melhores soluções.</p>
+      <p><strong>Formigas</strong> controla o número de formigas na simulação. Mais formigas exploram mais caminhos, mas podem tornar a simulação mais lenta.</p>
+      <p><strong>Evaporação</strong> controla a taxa de evaporação dos feromônios a cada iteração. Valores mais altos fazem com que os feromônios desapareçam mais rapidamente.</p>
+      <p><strong>Feromônio</strong> controla a quantidade de feromônio depositado por cada formiga. Valores mais altos criam caminhos mais intensos.</p>
+      <p><strong>Reforço da Melhor Rota</strong> quando ativado, permite que a formiga com a melhor rota deposite mais feromônios, acelerando a convergência para a solução.</p>
       <p>Os pontos amarelos representam formigas viajando entre cidades. As linhas mudam de cor com base nos níveis de feromônio:</p>
       <ul>
         <li><strong>Rosa:</strong> Representa o melhor caminho encontrado até o momento.</li>

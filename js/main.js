@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let alpha = 1;
     let beta = 2;
     let delayMs = 300; // Default animation delay
+    let maxIterations = 10; // Default iterations
+    let numAnts = 2; // Will be updated based on city count
+    let evaporationRate = 0.5; // Default evaporation rate
+    let pheromoneConstant = 100; // Default pheromone deposit factor
+    let bestPathReinforcement = false; // Default best path reinforcement
     let isRunning = false;
     let simulation = null;
     let currentBestRoute = null;
@@ -15,9 +20,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const alphaSlider = document.getElementById('alpha-slider');
     const betaSlider = document.getElementById('beta-slider');
     const delaySlider = document.getElementById('delay-slider');
+    const iterationsSlider = document.getElementById('iterations-slider');
+    const antsSlider = document.getElementById('ants-slider');
+    const evaporationSlider = document.getElementById('evaporation-slider');
+    const pheromoneSlider = document.getElementById('pheromone-slider');
+    const bestPathToggle = document.getElementById('best-path-toggle');
     const alphaValue = document.getElementById('alpha-value');
     const betaValue = document.getElementById('beta-value');
     const delayValue = document.getElementById('delay-value');
+    const iterationsValue = document.getElementById('iterations-value');
+    const antsValue = document.getElementById('ants-value');
+    const evaporationValue = document.getElementById('evaporation-value');
+    const pheromoneValue = document.getElementById('pheromone-value');
     const resetBtn = document.getElementById('resetBtn');
     const statusContainer = document.getElementById('status-container');
     
@@ -34,6 +48,33 @@ document.addEventListener('DOMContentLoaded', function() {
     let cityIds = currentMap.ids;
     let distances = currentMap.distances;
     
+    // Set initial ants count based on number of cities
+    numAnts = Math.floor(cityIds.length / 2);
+    if (antsSlider) {
+      antsSlider.value = numAnts;
+      antsValue.textContent = numAnts;
+    }
+    
+    // Initialize other sliders with default values
+    if (iterationsSlider) {
+      iterationsSlider.value = maxIterations;
+      iterationsValue.textContent = maxIterations;
+    }
+    
+    if (evaporationSlider) {
+      evaporationSlider.value = evaporationRate;
+      evaporationValue.textContent = evaporationRate;
+    }
+    
+    if (pheromoneSlider) {
+      pheromoneSlider.value = pheromoneConstant;
+      pheromoneValue.textContent = pheromoneConstant;
+    }
+    
+    if (bestPathToggle) {
+      bestPathToggle.checked = bestPathReinforcement;
+    }
+    
     // Update slider value displays
     function updateSliderValues() {
       alphaValue.textContent = alphaSlider.value;
@@ -44,6 +85,20 @@ document.addEventListener('DOMContentLoaded', function() {
       
       delayValue.textContent = `${delaySlider.value}ms`;
       delayMs = parseInt(delaySlider.value, 10);
+      
+      iterationsValue.textContent = iterationsSlider.value;
+      maxIterations = parseInt(iterationsSlider.value, 10);
+      
+      antsValue.textContent = antsSlider.value;
+      numAnts = parseInt(antsSlider.value, 10);
+      
+      evaporationValue.textContent = evaporationSlider.value;
+      evaporationRate = parseFloat(evaporationSlider.value);
+      
+      pheromoneValue.textContent = pheromoneSlider.value;
+      pheromoneConstant = parseInt(pheromoneSlider.value, 10);
+      
+      bestPathReinforcement = bestPathToggle.checked;
     }
   
     // Handle ant movement - animation
@@ -210,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function() {
       currentBestRoute = null;
       
       // Remove any existing ants
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < numAnts; i++) {
         UI.removeAnt(i);
       }
       
@@ -218,8 +273,11 @@ document.addEventListener('DOMContentLoaded', function() {
       simulation = new ACO(cityIds, distances, {
         alpha,
         beta,
-        numAnts: Math.min(5, cityIds.length),
-        maxIterations: 10,
+        rho: evaporationRate,
+        Q: pheromoneConstant,
+        numAnts: numAnts,
+        maxIterations: maxIterations,
+        bestPathReinforcement: bestPathReinforcement,
         onAntMove: handleAntMove,
         onPheromoneUpdate: handlePheromoneUpdate,
         onIterationComplete: handleIterationComplete,
@@ -255,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
         road.classList.remove('best-path', 'ant-traveled');
       });
       
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < numAnts; i++) {
         UI.removeAnt(i);
       }
       
@@ -274,32 +332,18 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    // Generate a new city map
+    // Generate a new random map
     function generateNewMap() {
       const cityCount = parseInt(cityCountInput.value);
       
-      // Validate input
-      if (isNaN(cityCount) || cityCount < 4) {
-        cityCountInput.value = 4;
+      if (cityCount < 4 || cityCount > 100) {
+        genWarningElement.textContent = 'O número de cidades deve estar entre 4 e 100!';
         return;
       }
       
-      // Show warning for large number of cities
-      if (cityCount > 20) {
-        genWarningElement.textContent = 'Aviso: Muitas cidades podem prejudicar o desempenho e a visualização!';
-      } else {
-        genWarningElement.textContent = '';
-      }
+      genWarningElement.textContent = '';
       
-      // Stop any running simulation
-      if (isRunning) {
-        // Force stop
-        isRunning = false;
-        simulateBtn.disabled = false;
-        simulateBtn.textContent = 'Simular';
-      }
-      
-      // Reset the visualization
+      // Reset any simulation
       resetVisualization();
       
       // Generate new map
@@ -307,8 +351,15 @@ document.addEventListener('DOMContentLoaded', function() {
       cityIds = currentMap.ids;
       distances = currentMap.distances;
       
-      // Replace the map in the DOM
+      // Update the map visualization
       cityGenerator.replaceMap(currentMap);
+      
+      // Update ant count based on new city count
+      numAnts = Math.floor(cityIds.length / 2);
+      if (antsSlider) {
+        antsSlider.value = numAnts;
+        antsValue.textContent = numAnts;
+      }
       
       if (statusElement) {
         statusElement.textContent = `Mapa gerado com ${cityCount} cidades. Pronto para simular.`;
@@ -316,31 +367,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   
     // Event listeners
-    if (simulateBtn) {
-      simulateBtn.addEventListener('click', runSimulation);
-    }
-    
-    if (resetBtn) {
-      resetBtn.addEventListener('click', resetVisualization);
-    }
-    
-    if (generateMapBtn) {
-      generateMapBtn.addEventListener('click', generateNewMap);
-    }
-    
-    // City count input validation
-    if (cityCountInput) {
-      cityCountInput.addEventListener('input', function() {
-        const cityCount = parseInt(this.value);
-        
-        if (cityCount > 20) {
-          genWarningElement.textContent = 'Aviso: Muitas cidades podem prejudicar o desempenho e a visualização!';
-        } else {
-          genWarningElement.textContent = '';
-        }
-      });
-    }
-    
     if (alphaSlider) {
       alphaSlider.addEventListener('input', function() {
         updateSliderValues();
@@ -363,7 +389,78 @@ document.addEventListener('DOMContentLoaded', function() {
       delaySlider.addEventListener('input', function() {
         updateSliderValues();
         if (simulation) {
-          simulation.setIterationDelay(delayMs * 1.5);
+          simulation.setIterationDelay(delayMs);
+        }
+      });
+    }
+    
+    if (iterationsSlider) {
+      iterationsSlider.addEventListener('input', function() {
+        updateSliderValues();
+        if (simulation) {
+          simulation.setMaxIterations(maxIterations);
+        }
+      });
+    }
+    
+    if (antsSlider) {
+      antsSlider.addEventListener('input', function() {
+        updateSliderValues();
+        if (simulation) {
+          simulation.setNumAnts(numAnts);
+        }
+      });
+    }
+    
+    if (evaporationSlider) {
+      evaporationSlider.addEventListener('input', function() {
+        updateSliderValues();
+        if (simulation) {
+          simulation.setEvaporationRate(evaporationRate);
+        }
+      });
+    }
+    
+    if (pheromoneSlider) {
+      pheromoneSlider.addEventListener('input', function() {
+        updateSliderValues();
+        if (simulation) {
+          simulation.setPheromoneConstant(pheromoneConstant);
+        }
+      });
+    }
+    
+    if (bestPathToggle) {
+      bestPathToggle.addEventListener('change', function() {
+        updateSliderValues();
+        if (simulation) {
+          simulation.setBestPathReinforcement(bestPathReinforcement);
+        }
+      });
+    }
+    
+    // Set up buttons
+    if (simulateBtn) {
+      simulateBtn.addEventListener('click', runSimulation);
+    }
+    
+    if (resetBtn) {
+      resetBtn.addEventListener('click', resetVisualization);
+    }
+    
+    if (generateMapBtn) {
+      generateMapBtn.addEventListener('click', generateNewMap);
+    }
+    
+    // City count input validation
+    if (cityCountInput) {
+      cityCountInput.addEventListener('input', function() {
+        const cityCount = parseInt(this.value);
+        
+        if (cityCount > 20) {
+          genWarningElement.textContent = 'Aviso: Muitas cidades podem prejudicar o desempenho e a visualização!';
+        } else {
+          genWarningElement.textContent = '';
         }
       });
     }

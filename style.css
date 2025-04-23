@@ -496,4 +496,19 @@ svg {
   box-shadow: 0 0 8px rgba(0, 85, 165, 0.5);
   background-color: #f0f5ff;
   transition: all 0.3s ease;
+}
+
+/* Road hover effects */
+.road.road-hovered {
+  stroke-width: 4px !important;
+  stroke: #333 !important;
+  z-index: 10;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.road.road-dimmed {
+  stroke-width: 1px !important;
+  opacity: 0.3;
+  transition: all 0.2s ease;
 } 

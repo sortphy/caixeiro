@@ -1,19 +1,62 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // Edge hover effect
-  document.querySelectorAll('.edge').forEach(edge => {
+  // Initial setup of edge hover effects
+  setupEdgeHoverEffects();
+
+  // Function to set up hover effects for all edges
+  function setupEdgeHoverEffects() {
+    document.querySelectorAll('.edge').forEach(edge => {
+      const line = edge.querySelector('.road');
+      
+      // Remove any existing listeners to prevent duplicates
+      edge.removeEventListener('mouseenter', handleEdgeMouseEnter);
+      edge.removeEventListener('mouseleave', handleEdgeMouseLeave);
+      
+      // Add new listeners
+      edge.addEventListener('mouseenter', handleEdgeMouseEnter);
+      edge.addEventListener('mouseleave', handleEdgeMouseLeave);
+    });
+  }
+  
+  // Handle edge mouse enter
+  function handleEdgeMouseEnter(event) {
+    const edge = event.currentTarget;
     const line = edge.querySelector('.road');
-    edge.addEventListener('mouseenter', () => {
-      line.classList.add('highlighted');
-      const from = edge.getAttribute('data-from');
-      const to = edge.getAttribute('data-to');
-      const dist = edge.getAttribute('data-distance');
-      document.getElementById('distance-info').textContent = `${from} → ${to} Distance: ${dist}`;
+    
+    // Highlight current road
+    line.classList.add('highlighted');
+    line.classList.add('road-hovered');
+    
+    // Dim all other roads
+    document.querySelectorAll('.road').forEach(road => {
+      if (road !== line) {
+        road.classList.add('road-dimmed');
+      }
     });
-    edge.addEventListener('mouseleave', () => {
-      line.classList.remove('highlighted');
-      document.getElementById('distance-info').textContent = '';
+    
+    // Show distance info
+    const from = edge.getAttribute('data-from');
+    const to = edge.getAttribute('data-to');
+    const dist = edge.getAttribute('data-distance');
+    document.getElementById('distance-info').textContent = `${from} → ${to} Distance: ${dist}`;
+  }
+  
+  // Handle edge mouse leave
+  function handleEdgeMouseLeave(event) {
+    const edge = event.currentTarget;
+    const line = edge.querySelector('.road');
+    
+    // Remove highlighting from current road
+    line.classList.remove('highlighted');
+    line.classList.remove('road-hovered');
+    
+    // Restore all other roads
+    document.querySelectorAll('.road').forEach(road => {
+      road.classList.remove('road-dimmed');
     });
-  });
+    
+    // Clear distance info
+    document.getElementById('distance-info').textContent = '';
+  }
 
   // Create ant SVG element
   function createAnt(id) {
@@ -102,6 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.road').forEach(road => {
       road.style.stroke = '';
       road.style.strokeWidth = '';
+      road.classList.remove('road-hovered', 'road-dimmed', 'highlighted');
     });
   }
 
@@ -113,6 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
     moveAnt,
     findEdgeElement,
     updateEdgeStyle,
-    resetEdges
+    resetEdges,
+    setupEdgeHoverEffects
   };
 }); 

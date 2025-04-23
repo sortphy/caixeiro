@@ -169,12 +169,22 @@ class CityGenerator {
     // Replace the old SVG with the new one
     mapContainer.replaceChild(newSvg, oldSvg);
     
-    // Set up the hover effects for the new roads
-    this.setupEdgeHoverEffects();
+    // Set up the hover effects for the new roads using the UI module
+    if (window.UI && window.UI.setupEdgeHoverEffects) {
+      window.UI.setupEdgeHoverEffects();
+    }
   }
 
-  // Set up hover effects for road edges
+  // This method is now redundant as we're using UI.setupEdgeHoverEffects
+  // Keeping it for backward compatibility but it's not used
   setupEdgeHoverEffects() {
+    // Use the UI implementation if available
+    if (window.UI && window.UI.setupEdgeHoverEffects) {
+      window.UI.setupEdgeHoverEffects();
+      return;
+    }
+    
+    // Fallback implementation
     document.querySelectorAll('.edge').forEach(edge => {
       const line = edge.querySelector('.road');
       edge.addEventListener('mouseenter', () => {

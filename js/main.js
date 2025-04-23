@@ -185,6 +185,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupBestPathHighlight() {
       if (statusContainer) {
         statusContainer.addEventListener('mouseenter', function() {
+          // Remove any existing hover effects first
+          document.querySelectorAll('.road').forEach(path => {
+            path.classList.remove('road-hovered', 'road-dimmed');
+          });
+          
           // Check if we have the best path edges stored
           if (window.bestPathEdges && window.bestPathEdges.length > 0) {
             // Highlight best path edges directly from our stored array
@@ -310,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetVisualization() {
       UI.resetEdges();
       document.querySelectorAll('.road').forEach(road => {
-        road.classList.remove('best-path', 'ant-traveled');
+        road.classList.remove('best-path', 'ant-traveled', 'road-hovered', 'road-dimmed');
       });
       
       for (let i = 0; i < numAnts; i++) {

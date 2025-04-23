@@ -39,9 +39,9 @@
 - Ao passar o mouse sobre os caminhos, é apresentado o comprimento daquela conexão.
 - Animação de todo o processo de ACO:
     - Formigas representadas e animadas individualmente.
-    - Níveis de feromonios em cada caminho são representados por cores.
+    - Níveis de feromônios em cada caminho são representados por cores.
     - Caminhos com formiga são destacados.
     - O atual melhor caminho pode ser isolado para melhor visualização.
-- Valores de influencia Alfa (feromônios) e Beta (distâncias) podem ser alterados na equação do ACO.
-- Velocidade em que o algoritimo e as animações rodam podem ser alteradas.
+- Valores de influência Alfa (feromônios) e Beta (distâncias) podem ser alterados na equação do ACO.
+- Velocidade em que o algorítimo e as animações rodam podem ser alteradas.
 

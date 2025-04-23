@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caixeiro Viajante com AOC | Sortphy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <img src="img/sortphy.png" alt="Sortphy Logo" class="logo">
+      <div class="header-text">
+        <h1>Mini Caixeiro Viajante com AOC</h1>
+        <p>Feito por Sortphy - <a href="https://github.com/sortphy" target="_blank">github.com/Sortphy</a></p>
+      </div>
+    </div>
+  </header>
+  
+  <div id="map-container">
+    <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
+      <!-- Roads with hover data -->
+      <g class="edge" data-from="A" data-to="B" data-distance="10">
+        <line class="road" x1="200" y1="200" x2="141.7" y2="320.8" />
+      </g>
+      <g class="edge" data-from="A" data-to="C" data-distance="15">
+        <line class="road" x1="200" y1="200" x2="306.1" y2="49.0" />
+      </g>
+      <g class="edge" data-from="A" data-to="D" data-distance="20">
+        <line class="road" x1="200" y1="200" x2="15.5" y2="109.2" />
+      </g>
+      <g class="edge" data-from="B" data-to="C" data-distance="35">
+        <line class="road" x1="141.7" y1="320.8" x2="306.1" y2="49.0" />
+      </g>
+      <g class="edge" data-from="B" data-to="D" data-distance="25">
+        <line class="road" x1="141.7" y1="320.8" x2="15.5" y2="109.2" />
+      </g>
+      <g class="edge" data-from="C" data-to="D" data-distance="30">
+        <line class="road" x1="306.1" y1="49.0" x2="15.5" y2="109.2" />
+      </g>
+
+      <!-- Cities on top -->
+      <circle id="A" class="city" cx="200" cy="200" r="8" />
+      <text class="city-label" x="200" y="200">A</text>
+
+      <circle id="B" class="city" cx="141.7" cy="320.8" r="8" />
+      <text class="city-label" x="141.7" y="320.8">B</text>
+
+      <circle id="C" class="city" cx="306.1" cy="49.0" r="8" />
+      <text class="city-label" x="306.1" y="49.0">C</text>
+
+      <circle id="D" class="city" cx="15.5" cy="109.2" r="8" />
+      <text class="city-label" x="15.5" y="109.2">D</text>
+    </svg>
+  </div>
+  <div id="distance-info"></div>
+  
+  <!-- Status Container -->
+  <div id="status-container">
+    <div id="status">Pronto para iniciar a simulação do algoritmo ACO</div>
+    <div class="stats">
+      <div class="stat-item">Iteração: <span id="iteration">0</span></div>
+      <div class="stat-item">Melhor Distância: <span id="best-distance">-</span></div>
+    </div>
+  </div>
+  
+  <!-- Controls -->
+  <div class="controls">
+    <div class="control-item">
+      <div class="slider-container">
+        <label for="alpha-slider">Alfa:</label>
+        <input type="range" id="alpha-slider" min="0.1" max="5" step="0.1" value="1">
+        <span id="alpha-value" class="slider-value">1</span>
+      </div>
+    </div>
+    <div class="control-item">
+      <div class="slider-container">
+        <label for="beta-slider">Beta:</label>
+        <input type="range" id="beta-slider" min="0.1" max="5" step="0.1" value="2">
+        <span id="beta-value" class="slider-value">2</span>
+      </div>
+    </div>
+    <div class="control-item">
+      <div class="slider-container">
+        <label for="delay-slider">Velocidade:</label>
+        <input type="range" id="delay-slider" min="10" max="1000" step="10" value="300">
+        <span id="delay-value" class="slider-value">300ms</span>
+      </div>
+    </div>
+    <div class="button-container">
+      <button id="simulateBtn">Simular</button>
+      <button id="resetBtn">Reiniciar</button>
+    </div>
+  </div>
+  
+  <!-- Color legend -->
+  <div class="legend-container">
+    <div class="legend-title">Legenda de Cores</div>
+    <div class="legend-item">
+      <div class="color-sample best-path-sample"></div>
+      <div class="legend-text">Melhor caminho encontrado</div>
+    </div>
+    <div class="legend-item">
+      <div class="color-sample ant-path-sample"></div>
+      <div class="legend-text">Formiga em movimento</div>
+    </div>
+    <div class="legend-item pheromone-legend">
+      <div class="color-gradient">
+        <div class="gradient-low">Pouco feromônio</div>
+        <div class="gradient-bar"></div>
+        <div class="gradient-high">Muito feromônio</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Info Box -->
+  <div class="info-box">
+    <div class="info-title">Sobre o Algoritmo</div>
+    <div class="info-content">
+      <p>Esta simulação usa Otimização por Colônia de Formigas (ACO) para resolver o Problema do Caixeiro Viajante (TSP).</p>
+      <p><strong>Alfa</strong> controla a influência dos feromônios. Valores mais altos fazem com que as formigas sigam caminhos existentes com maior probabilidade.</p>
+      <p><strong>Beta</strong> controla a influência das distâncias. Valores mais altos fazem com que as formigas escolham caminhos mais curtos com maior probabilidade.</p>
+      <p><strong>Velocidade</strong> controla a velocidade de animação das formigas e da simulação.</p>
+      <p>Os pontos amarelos representam formigas viajando entre cidades. As linhas mudam de cor com base nos níveis de feromônio:</p>
+      <ul>
+        <li><strong>Rosa:</strong> Representa o melhor caminho encontrado até o momento.</li>
+        <li><strong>Verde → Vermelho:</strong> Indica a intensidade do feromônio. Caminhos que começam verdes têm pouco feromônio, enquanto caminhos que ficam vermelhos têm níveis altos de feromônio.</li>
+        <li><strong>Amarelo:</strong> Mostra temporariamente o caminho que uma formiga está percorrendo no momento.</li>
+      </ul>
+      
+      <div class="equation-container">
+        <h4>Fórmulas Matemáticas</h4>
+        <div class="equation">
+          <p><strong>Probabilidade de escolha do próximo caminho:</strong></p>
+          <div class="math-formula">
+            p<sub>ij</sub> = 
+            <div class="fraction">
+              <div class="numerator">[τ<sub>ij</sub>]<sup>α</sup> · [η<sub>ij</sub>]<sup>β</sup></div>
+              <div class="denominator">Σ [τ<sub>il</sub>]<sup>α</sup> · [η<sub>il</sub>]<sup>β</sup></div>
+            </div>
+          </div>
+          <p class="equation-desc">Onde τ<sub>ij</sub> é o nível de feromônio e η<sub>ij</sub> = 1/d<sub>ij</sub> é a visibilidade (inverso da distância).</p>
+        </div>
+        
+        <div class="equation">
+          <p><strong>Atualização de feromônio:</strong></p>
+          <div class="math-formula">
+            τ<sub>ij</sub> = (1-ρ) · τ<sub>ij</sub> + Σ Δτ<sub>ij</sub><sup>k</sup>
+          </div>
+          <p class="equation-desc">Onde ρ é a taxa de evaporação, e Δτ<sub>ij</sub><sup>k</sup> = Q/L<sub>k</sub> é a quantidade de feromônio depositada pela formiga k (Q é constante, L<sub>k</sub> é o comprimento do caminho).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/aco.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

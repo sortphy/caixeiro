@@ -33,7 +33,7 @@
 
 
 ---------
-### Nossa resolução conta com:
+### Nossa implementação conta com:
 - Novos mapas podem ser gerados dinamicamente com qualquer número de cidades.
 - Todos os mapas gerados possuem visualização em escala real das distâncias.
 - Ao passar o mouse sobre os caminhos, é apresentado o comprimento daquela conexão.
@@ -42,6 +42,13 @@
     - Níveis de feromônios em cada caminho são representados por cores.
     - Caminhos com formiga são destacados.
     - O atual melhor caminho pode ser isolado para melhor visualização.
-- Valores de influência Alfa (feromônios) e Beta (distâncias) podem ser alterados na equação do ACO.
-- Velocidade em que o algorítimo e as animações rodam podem ser alteradas.
+- Equação de ACO com valores customizáveis:
+    - Velocidade: Velocidade em que o algoritmo roda, pode ser alterada para melhor visualização gráfica.
+    - Alfa: Influência dos feromônios nas decisões das formigas.
+    - Beta: Influência das distâncias nas decisões das formigas.
+    - Iterações: Quantas vezes o algoritmo vai ser rodado.
+    - Formigas: Número total de formigas no sistema.
+    - Evaporação: Taxa de evaporação dos feromônios.
+    - Feromônio: Quantidade de feromônios depositados por cada formiga.
+    - Reforço da Melhor Rota: Faz com que a formiga com a melhor rota deposite mais feromônios.
 

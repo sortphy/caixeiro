@@ -19,20 +19,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const betaValue = document.getElementById('beta-value');
     const delayValue = document.getElementById('delay-value');
     const resetBtn = document.getElementById('resetBtn');
-  
-    // City IDs
-    const cityIds = ['A', 'B', 'C', 'D'];
     
-    // Map distances from data-distance attributes
-    const distances = {};
-    document.querySelectorAll('.edge').forEach(edge => {
-      const from = edge.getAttribute('data-from');
-      const to = edge.getAttribute('data-to');
-      const distance = parseInt(edge.getAttribute('data-distance'), 10);
-      distances[`${from}-${to}`] = distance;
-      distances[`${to}-${from}`] = distance;
-    });
-  
+    // City generator UI elements
+    const cityCountInput = document.getElementById('city-count');
+    const generateMapBtn = document.getElementById('generate-map-btn');
+    const genWarningElement = document.getElementById('gen-warning');
+    
+    // Initialize city generator
+    const cityGenerator = new CityGenerator();
+    
+    // Current map data
+    let currentMap = cityGenerator.getDefaultMap();
+    let cityIds = currentMap.ids;
+    let distances = currentMap.distances;
+    
     // Update slider value displays
     function updateSliderValues() {
       alphaValue.textContent = alphaSlider.value;
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
       simulation = new ACO(cityIds, distances, {
         alpha,
         beta,
-        numAnts: 5,
+        numAnts: Math.min(5, cityIds.length),
         maxIterations: 10,
         onAntMove: handleAntMove,
         onPheromoneUpdate: handlePheromoneUpdate,
@@ -223,6 +223,47 @@ document.addEventListener('DOMContentLoaded', function() {
         bestDistanceElement.textContent = '-';
       }
     }
+    
+    // Generate a new city map
+    function generateNewMap() {
+      const cityCount = parseInt(cityCountInput.value);
+      
+      // Validate input
+      if (isNaN(cityCount) || cityCount < 4) {
+        cityCountInput.value = 4;
+        return;
+      }
+      
+      // Show warning for large number of cities
+      if (cityCount > 20) {
+        genWarningElement.textContent = 'Aviso: Muitas cidades podem prejudicar o desempenho e a visualização!';
+      } else {
+        genWarningElement.textContent = '';
+      }
+      
+      // Stop any running simulation
+      if (isRunning) {
+        // Force stop
+        isRunning = false;
+        simulateBtn.disabled = false;
+        simulateBtn.textContent = 'Simular';
+      }
+      
+      // Reset the visualization
+      resetVisualization();
+      
+      // Generate new map
+      currentMap = cityGenerator.generateMap(cityCount);
+      cityIds = currentMap.ids;
+      distances = currentMap.distances;
+      
+      // Replace the map in the DOM
+      cityGenerator.replaceMap(currentMap);
+      
+      if (statusElement) {
+        statusElement.textContent = `Mapa gerado com ${cityCount} cidades. Pronto para simular.`;
+      }
+    }
   
     // Event listeners
     if (simulateBtn) {
@@ -231,6 +272,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (resetBtn) {
       resetBtn.addEventListener('click', resetVisualization);
+    }
+    
+    if (generateMapBtn) {
+      generateMapBtn.addEventListener('click', generateNewMap);
+    }
+    
+    // City count input validation
+    if (cityCountInput) {
+      cityCountInput.addEventListener('input', function() {
+        const cityCount = parseInt(this.value);
+        
+        if (cityCount > 20) {
+          genWarningElement.textContent = 'Aviso: Muitas cidades podem prejudicar o desempenho e a visualização!';
+        } else {
+          genWarningElement.textContent = '';
+        }
+      });
     }
     
     if (alphaSlider) {
@@ -260,10 +318,8 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
     
-    // Initialize slider values
-    if (alphaSlider && betaSlider && delaySlider) {
-      updateSliderValues();
-    }
+    // Initial setup
+    updateSliderValues();
 
     // Theme toggle functionality
     const themeToggle = document.getElementById('theme-toggle');

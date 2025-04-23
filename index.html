@@ -18,6 +18,16 @@
     </div>
   </header>
   
+  <!-- City Generator Controls -->
+  <div class="city-gen-controls">
+    <div class="control-item">
+      <label for="city-count">Número de Cidades:</label>
+      <input type="number" id="city-count" min="4" max="100" value="4">
+      <button id="generate-map-btn">Gerar Mapa</button>
+    </div>
+    <div id="gen-warning" class="warning-message"></div>
+  </div>
+  
   <div id="map-container">
     <svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet">
       <!-- Roads with hover data -->
@@ -156,6 +166,7 @@
 
   <script src="js/aco.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/cityGen.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

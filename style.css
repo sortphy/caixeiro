@@ -323,4 +323,58 @@ svg {
   font-style: italic;
   font-size: 0.85rem;
   margin-top: 0.5rem;
+}
+
+/* City Generator Controls */
+.city-gen-controls {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f5f5f5;
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.city-gen-controls .control-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.city-gen-controls label {
+  font-size: 0.9rem;
+  margin-right: 5px;
+}
+
+#city-count {
+  width: 60px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  text-align: center;
+}
+
+#generate-map-btn {
+  padding: 5px 10px;
+  background: #0055a5;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#generate-map-btn:hover {
+  background: #004080;
+}
+
+.warning-message {
+  color: #ff0000;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  text-align: center;
+  min-height: 1.2em;
 } 

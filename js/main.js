@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let evaporationRate = 0.5; // Default evaporation rate
     let pheromoneConstant = 100; // Default pheromone deposit factor
     let bestPathReinforcement = false; // Default best path reinforcement
+    let isFullSpeed = false; // Full speed mode flag
     let isRunning = false;
     let simulation = null;
     let currentBestRoute = null;
@@ -25,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const evaporationSlider = document.getElementById('evaporation-slider');
     const pheromoneSlider = document.getElementById('pheromone-slider');
     const bestPathToggle = document.getElementById('best-path-toggle');
+    const fullSpeedToggle = document.getElementById('full-speed-toggle');
     const alphaValue = document.getElementById('alpha-value');
     const betaValue = document.getElementById('beta-value');
     const delayValue = document.getElementById('delay-value');
@@ -262,8 +264,13 @@ document.addEventListener('DOMContentLoaded', function() {
       simulateBtn.textContent = 'Executando...';
       
       if (statusElement) {
-        statusElement.textContent = 'Iniciando simulação...';
+        statusElement.textContent = isFullSpeed ? 
+          'Simulando em velocidade máxima... (aguarde alguns instantes)' : 
+          'Iniciando simulação...';
       }
+      
+      // Force UI update before proceeding, especially important for full speed mode
+      await new Promise(resolve => setTimeout(resolve, 10));
       
       // Reset UI
       UI.resetEdges();
@@ -283,6 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
         numAnts: numAnts,
         maxIterations: maxIterations,
         bestPathReinforcement: bestPathReinforcement,
+        isFullSpeed: isFullSpeed,
         onAntMove: handleAntMove,
         onPheromoneUpdate: handlePheromoneUpdate,
         onIterationComplete: handleIterationComplete,
@@ -440,6 +448,15 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSliderValues();
         if (simulation) {
           simulation.setBestPathReinforcement(bestPathReinforcement);
+        }
+      });
+    }
+    
+    if (fullSpeedToggle) {
+      fullSpeedToggle.addEventListener('change', function() {
+        isFullSpeed = fullSpeedToggle.checked;
+        if (simulation) {
+          simulation.setFullSpeed(isFullSpeed);
         }
       });
     }

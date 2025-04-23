@@ -16,6 +16,7 @@ class ACO {
       this.maxIterations = options.maxIterations || 10;
       this.iterationDelay = options.iterationDelay || 500; // Delay between iterations in ms
       this.bestPathReinforcement = options.bestPathReinforcement || false; // Enable best path reinforcement
+      this.isFullSpeed = options.isFullSpeed || false; // Full speed mode (no animation delays)
       
       // Initialize pheromones
       this.pheromones = {};
@@ -56,8 +57,10 @@ class ACO {
         // Update the best route if needed
         this.onIterationComplete(this.currentIteration, this.bestRoute, this.bestDistance);
         
-        // Add a small delay to visualize iterations
-        await new Promise(resolve => setTimeout(resolve, this.iterationDelay));
+        // Add a small delay to visualize iterations, but skip if in full speed mode
+        if (!this.isFullSpeed) {
+          await new Promise(resolve => setTimeout(resolve, this.iterationDelay));
+        }
       }
       
       return {
@@ -87,8 +90,10 @@ class ACO {
             const distance = this.distances[this.getEdgeKey(ant.currentCity, nextCity)];
             ant.totalDistance += distance;
             
-            // Animate ant movement
-            await this.onAntMove(ant.id, ant.currentCity, nextCity, distance);
+            // Animate ant movement, but skip animation in full speed mode
+            if (!this.isFullSpeed) {
+              await this.onAntMove(ant.id, ant.currentCity, nextCity, distance);
+            }
             
             ant.currentCity = nextCity;
             ant.visitedCities.push(nextCity);
@@ -102,8 +107,10 @@ class ACO {
         const distance = this.distances[this.getEdgeKey(ant.currentCity, startCity)];
         ant.totalDistance += distance;
         
-        // Animate final return movement
-        await this.onAntMove(ant.id, ant.currentCity, startCity, distance);
+        // Animate final return movement, but skip animation in full speed mode
+        if (!this.isFullSpeed) {
+          await this.onAntMove(ant.id, ant.currentCity, startCity, distance);
+        }
         
         ant.visitedCities.push(startCity);
       }
@@ -199,8 +206,10 @@ class ACO {
             this.pheromones[edge] += contribution * 2; // Double pheromone for best ant
           }
           
-          // Notify about pheromone update for visualization
-          await this.onPheromoneUpdate(edge, this.pheromones[edge]);
+          // Notify about pheromone update for visualization, but skip animation in full speed mode
+          if (!this.isFullSpeed) {
+            await this.onPheromoneUpdate(edge, this.pheromones[edge]);
+          }
         }
       }
       
@@ -215,8 +224,18 @@ class ACO {
           
           this.pheromones[edge] += bestPathContribution;
           
-          // Notify about pheromone update for visualization
-          await this.onPheromoneUpdate(edge, this.pheromones[edge]);
+          // Notify about pheromone update for visualization, but skip animation in full speed mode
+          if (!this.isFullSpeed) {
+            await this.onPheromoneUpdate(edge, this.pheromones[edge]);
+          }
+        }
+      }
+      
+      // If in full speed mode, update the visualization once at the end of the update
+      if (this.isFullSpeed) {
+        // Update pheromone visualization for all edges at once
+        for (const edge in this.pheromones) {
+          this.onPheromoneUpdate(edge, this.pheromones[edge]);
         }
       }
     }
@@ -251,5 +270,9 @@ class ACO {
     
     setBestPathReinforcement(enabled) {
       this.bestPathReinforcement = enabled;
+    }
+    
+    setFullSpeed(enabled) {
+      this.isFullSpeed = enabled;
     }
   }
